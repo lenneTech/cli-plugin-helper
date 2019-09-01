@@ -1,0 +1,75 @@
+{
+  "name": "@lenne.tech/typescript-starter",
+  "version": "0.0.1",
+  "description": "Start for a new typescript project",
+  "keywords": [
+    "lenne.Tech",
+    "typescript",
+    "starter",
+    "npm",
+    "package"
+  ],
+  "author": "Kai Haase",
+  "homepage": "http://lenne.tech",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lenneTech/typescript-starter"
+  },
+  "bugs": {
+    "url": "https://github.com/lenneTech/typescript-starter/issues"
+  },
+  "scripts": {
+    "build": "npm run lint && npm run test && npm run clean-build && npm run compile",
+    "clean-build": "rimraf ./build",
+    "compile": "tsc -p .",
+    "coverage": "jest --coverage",
+    "format": "prettier --write 'src/**/*.{js,ts,tsx,json}'",
+    "lint": "eslint --ext .js,.ts src",
+    "postinstall": "node dist/bin/welcome.bin.js $INIT_CWD || true",
+    "prepack": "npm run build",
+    "preversion": "npm run lint",
+    "test": "jest",
+    "watch": "jest --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@lenne.tech/npm-package-helper": "0.0.9",
+    "@types/jest": "24.0.18",
+    "@types/node": "12.7.3",
+    "@typescript-eslint/eslint-plugin": "2.0.0",
+    "@typescript-eslint/parser": "2.0.0",
+    "eslint": "6.3.0",
+    "eslint-config-prettier": "6.1.0",
+    "husky": "3.0.4",
+    "jest": "24.9.0",
+    "prettier": "1.18.2",
+    "pretty-quick": "1.11.1",
+    "rimraf": "3.0.0",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.3.0",
+    "typescript": "3.6.2"
+  },
+  "peerDependencies": {},
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "ts-node --skip-project extras/sync-version.ts && pretty-quick --staged",
+      "pre-push": "npm run lint && npm run test"
+    }
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "LICENSE",
+    "README.md"
+  ]
+}
