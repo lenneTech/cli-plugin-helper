@@ -1,11 +1,11 @@
-import Welcome from './modules/welcome/welcome.class';
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// Classes exports
+// -----------------------------------------------------------------------------------------------------------------------------------------
+export { Helper } from './extensions/helper.extension';
 
-/**
- * Exports
- */
-
-// Default export
-export default Welcome;
-
-// Other exports
-export * from './modules/welcome/welcome.interface';
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// Interface exports
+// -----------------------------------------------------------------------------------------------------------------------------------------
+export {
+  IHelperExtendedGluegunToolbox
+} from './interfaces/extended-gluegun-toolbox.interface';

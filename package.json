@@ -1,15 +1,15 @@
 {
-  "name": "@lenne.tech/typescript-starter",
+  "name": "@lenne.tech/cli-helper",
   "version": "0.0.1",
-  "description": "Start for a new typescript project",
+  "description": "Helper for CLI Projects",
   "keywords": [
     "lenne.Tech",
-    "typescript",
-    "starter",
+    "cli",
+    "helper",
     "npm",
     "package"
   ],
-  "author": "Kai Haase",
+  "author": "Pascal Klesse & Kai Haase",
   "homepage": "http://lenne.tech",
   "license": "MIT",
   "repository": {
@@ -20,7 +20,7 @@
     "url": "https://github.com/lenneTech/typescript-starter/issues"
   },
   "scripts": {
-    "build": "npm run lint && npm run test && npm run clean-build && npm run compile",
+    "build": "npm run lint && npm run clean-build && npm run compile",
     "clean-build": "rimraf ./build",
     "compile": "tsc -p .",
     "coverage": "jest --coverage",
@@ -48,9 +48,12 @@
     "rimraf": "3.0.0",
     "ts-jest": "24.0.2",
     "ts-node": "8.3.0",
-    "typescript": "3.6.2"
+    "typescript": "3.6.2",
+    "gluegun": "3.3.4"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "gluegun": "3.3.4"
+  },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node"
@@ -61,7 +64,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "ts-node --skip-project extras/sync-version.ts && pretty-quick --staged",
-      "pre-push": "npm run lint && npm run test"
+      "pre-push": "npm run lint"
     }
   },
   "main": "dist/index.js",
