@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "lib": [
       "es2015",
       "scripthost",
@@ -15,11 +17,12 @@
     "noImplicitAny": false,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "sourceMap": true,
     "outDir": "dist",
-    "strict": false,
-    "target": "es6",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "target": "es2015"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
