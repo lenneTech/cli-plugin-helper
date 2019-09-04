@@ -1,5 +1,7 @@
-import { IHelperExtendedGluegunToolbox } from '../interfaces/extended-gluegun-toolbox.interface';
 import * as fs from 'fs';
+import * as os from 'os';
+import { join, sep } from 'path';
+import { IHelperExtendedGluegunToolbox } from '../interfaces/extended-gluegun-toolbox.interface';
 
 /**
  * Common helper functions
@@ -9,6 +11,64 @@ export class Helper {
    * Constructor for integration of toolbox
    */
   constructor(protected toolbox: IHelperExtendedGluegunToolbox) {}
+
+  /**
+   * Get configuration
+   */
+  public async getConfig() {
+    // Toolbox feature
+    const {
+      config,
+      filesystem,
+      runtime: { brand }
+    } = this.toolbox;
+
+    // Configuration in home directory (~/.brand)
+    let homeDirConfig = {};
+    try {
+      const homeDirConfigFile = join(filesystem.homedir(), '.' + brand);
+      if (await filesystem.existsAsync(homeDirConfigFile)) {
+        homeDirConfig = JSON.parse(
+          await filesystem.readAsync(homeDirConfigFile)
+        );
+      }
+    } catch (e) {
+      // Nothing
+    }
+
+    // Configuration in current directory (./.brand)
+    let currentDirConfig = {};
+    try {
+      const currentDirConfigFile = join(filesystem.cwd(), '.' + brand);
+      if (await filesystem.existsAsync(currentDirConfigFile)) {
+        currentDirConfig = JSON.parse(
+          await filesystem.readAsync(currentDirConfigFile)
+        );
+      }
+    } catch (e) {
+      // Nothing
+    }
+
+    return {
+      ...config[brand],
+      ...config.loadConfig(join('~', `.${brand}`), brand),
+      ...homeDirConfig,
+      ...config.loadConfig(filesystem.cwd(), brand),
+      ...currentDirConfig
+    };
+  }
+
+  /**
+   * Get prepared directory path
+   */
+  public getDir(...dirPath: string[]) {
+    if (!dirPath.join('')) {
+      return null;
+    }
+    return join(...dirPath) // normalized path
+      .replace('~', os.homedir()) // replace ~ with homedir
+      .replace(/\/|\\/gm, sep); // set OS specific separators
+  }
 
   /**
    * Get input if not set
@@ -90,14 +150,76 @@ export class Helper {
   /**
    * Trim and remove linebreaks from input
    */
-  public trim(input: string) {
+  public trim(input: any) {
     // Check input
-    if (!input) {
+    if (input !== 0 && !input) {
       return input;
     }
 
     // Trim input
-    return input.trim().replace(/(\r\n|\n|\r)/gm, '');
+    return input
+      .toString()
+      .trim()
+      .replace(/(\r\n|\n|\r)/gm, '');
+  }
+
+  /**
+   * Run update for cli
+   */
+  public async updateCli(options?: {
+    global?: boolean;
+    packageName?: string;
+    showInfos?: boolean;
+  }) {
+    // Toolbox
+    const {
+      helper,
+      meta,
+      print: { info, spin, success },
+      runtime: { brand, defaultPlugin },
+      system: { run, startTimer }
+    } = this.toolbox;
+
+    // Start timer
+    const timer = startTimer();
+
+    // Get package.json
+    const packageJson: any = await helper.readFile(
+      join(meta.src ? meta.src : defaultPlugin.directory, '..', 'package.json')
+    );
+
+    // Process options
+    const opts = Object.assign(
+      {
+        global: true,
+        packageName: packageJson ? packageJson.name : '',
+        showInfos: false
+      },
+      options
+    );
+
+    // Run without infos
+    if (!opts.showInfos) {
+      return run(`npm install${opts.global ? ' -g ' : ' '}${opts.packageName}`);
+    }
+
+    // Update
+    const updateSpin = spin(`Update ${opts.packageName}`);
+    await run(`npm install${opts.global ? ' -g ' : ' '}${opts.packageName}`);
+    updateSpin.succeed();
+
+    // Check new version
+    const versionSpin = spin(`Get current version from ${opts.packageName}`);
+    const version = helper.trim(await run(`${brand} version`));
+    versionSpin.succeed();
+
+    // Success
+    success(
+      `🎉 Updated to ${version} from ${
+        opts.packageName
+      } in ${helper.msToMinutesAndSeconds(timer())}m.`
+    );
+    info('');
   }
 
   /**
@@ -109,6 +231,7 @@ export class Helper {
   public async commandSelector(
     toolbox: IHelperExtendedGluegunToolbox,
     options?: {
+      checkUpdate?: boolean;
       level?: number;
       parentCommand?: string;
       welcome?: string;
@@ -116,18 +239,22 @@ export class Helper {
   ) {
     // Toolbox feature
     const {
+      config,
+      filesystem: { existsAsync },
       helper,
+      meta,
       print,
       prompt,
-      runtime: { commands }
+      runtime: { brand, commands, defaultPlugin }
     } = toolbox;
 
     // Prepare parent command
     const pC = options.parentCommand ? options.parentCommand.trim() : '';
 
     // Process options
-    const { level, parentCommand, welcome } = Object.assign(
+    const { checkUpdate, level, parentCommand, welcome } = Object.assign(
       {
+        checkUpdate: true,
         level: pC ? pC.split(' ').length : 0,
         parentCommand: '',
         welcome: pC
@@ -136,6 +263,33 @@ export class Helper {
       },
       options
     );
+
+    // Check for updates
+    if (
+      checkUpdate && // parameter
+      config[brand].checkForUpdate && // current configuration
+      (await helper.getConfig()).checkForUpdate && // extra configuration
+      !(await existsAsync(
+        join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src')
+      )) // not development environment
+    ) {
+      config[brand].checkForUpdate = false;
+
+      // tslint:disable-next-line:no-floating-promises
+      toolbox.meta
+        .checkForUpdate()
+        .then(update => {
+          if (update) {
+            // tslint:disable-next-line:no-floating-promises
+            helper.updateCli().catch(() => {
+              // do nothing
+            });
+          }
+        })
+        .catch(() => {
+          // do nothing
+        });
+    }
 
     // Welcome
     if (welcome) {
@@ -203,7 +357,17 @@ export class Helper {
         )[0];
 
         // Run command
-        command.run(toolbox);
+        try {
+          await command.run(toolbox);
+        } catch (e) {
+          // Abort via CTRL-C
+          if (!e) {
+            console.log('Goodbye ✌️');
+          } else {
+            // Throw error
+            throw e;
+          }
+        }
       }
     }
   }

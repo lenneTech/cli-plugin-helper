@@ -1,23 +1,26 @@
 {
-  "name": "@lenne.tech/cli-helper",
+  "name": "@lenne.tech/cli-plugin-helper",
   "version": "0.0.1",
-  "description": "Helper for CLI Projects",
+  "description": "Helper plugin for Gluegun CLI Projects",
   "keywords": [
     "lenne.Tech",
     "cli",
-    "helper",
-    "npm",
-    "package"
+    "gluegun",
+    "plugin",
+    "extension"
   ],
-  "author": "Pascal Klesse & Kai Haase",
+  "contributors": [
+    "Pascal Klesse",
+    "Kai Haase <kai.haase@lenne.tech> (http://lenne.tech)"
+  ],
   "homepage": "http://lenne.tech",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lenneTech/typescript-starter"
+    "url": "https://github.com/lenneTech/cli-plugin-helper"
   },
   "bugs": {
-    "url": "https://github.com/lenneTech/typescript-starter/issues"
+    "url": "https://github.com/lenneTech/cli-plugin-helper/issues"
   },
   "scripts": {
     "build": "npm run lint && npm run clean-build && npm run compile",
@@ -26,7 +29,6 @@
     "coverage": "jest --coverage",
     "format": "prettier --write 'src/**/*.{js,ts,tsx,json}'",
     "lint": "eslint --ext .js,.ts src",
-    "postinstall": "node dist/bin/welcome.bin.js $INIT_CWD || true",
     "prepack": "npm run build",
     "preversion": "npm run lint",
     "test": "jest",
@@ -36,12 +38,12 @@
   "devDependencies": {
     "@lenne.tech/npm-package-helper": "0.0.9",
     "@types/jest": "24.0.18",
-    "@types/node": "12.7.3",
-    "@typescript-eslint/eslint-plugin": "2.0.0",
-    "@typescript-eslint/parser": "2.0.0",
+    "@types/node": "12.7.4",
+    "@typescript-eslint/eslint-plugin": "2.1.0",
+    "@typescript-eslint/parser": "2.1.0",
     "eslint": "6.3.0",
-    "eslint-config-prettier": "6.1.0",
-    "husky": "3.0.4",
+    "eslint-config-prettier": "6.2.0",
+    "husky": "3.0.5",
     "jest": "24.9.0",
     "prettier": "1.18.2",
     "pretty-quick": "1.11.1",
