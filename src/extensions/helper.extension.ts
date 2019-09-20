@@ -53,7 +53,7 @@ export class Helper {
       ...config[brand],
       ...config.loadConfig(join('~', `.${brand}`), brand),
       ...homeDirConfig,
-      ...config.loadConfig(filesystem.cwd(), brand),
+      ...config.loadConfig(join(filesystem.cwd(), `.${brand}`), brand),
       ...currentDirConfig
     };
   }
