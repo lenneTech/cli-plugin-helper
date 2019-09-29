@@ -7,6 +7,4 @@ export { Npm } from './extensions/npm.extension';
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // Interface exports
 // -----------------------------------------------------------------------------------------------------------------------------------------
-export {
-  IHelperExtendedGluegunToolbox
-} from './interfaces/extended-gluegun-toolbox.interface';
+export { IHelperExtendedGluegunToolbox } from './interfaces/extended-gluegun-toolbox.interface';

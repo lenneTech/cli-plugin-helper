@@ -84,9 +84,7 @@ export class Npm {
   /**
    * Install npm packages
    */
-  public async install(
-    options: { cwd?: string; errorMessage?: string; showError?: boolean } = {}
-  ) {
+  public async install(options: { cwd?: string; errorMessage?: string; showError?: boolean } = {}) {
     // Toolbox features
     const {
       filesystem,

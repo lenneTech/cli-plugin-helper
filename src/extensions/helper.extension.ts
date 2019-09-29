@@ -28,9 +28,7 @@ export class Helper {
     try {
       const homeDirConfigFile = join(filesystem.homedir(), '.' + brand);
       if (await filesystem.existsAsync(homeDirConfigFile)) {
-        homeDirConfig = JSON.parse(
-          await filesystem.readAsync(homeDirConfigFile)
-        );
+        homeDirConfig = JSON.parse(await filesystem.readAsync(homeDirConfigFile));
       }
     } catch (e) {
       // Nothing
@@ -41,9 +39,7 @@ export class Helper {
     try {
       const currentDirConfigFile = join(filesystem.cwd(), '.' + brand);
       if (await filesystem.existsAsync(currentDirConfigFile)) {
-        currentDirConfig = JSON.parse(
-          await filesystem.readAsync(currentDirConfigFile)
-        );
+        currentDirConfig = JSON.parse(await filesystem.readAsync(currentDirConfigFile));
       }
     } catch (e) {
       // Nothing
@@ -166,11 +162,7 @@ export class Helper {
   /**
    * Run update for cli
    */
-  public async updateCli(options?: {
-    global?: boolean;
-    packageName?: string;
-    showInfos?: boolean;
-  }) {
+  public async updateCli(options?: { global?: boolean; packageName?: string; showInfos?: boolean }) {
     // Toolbox
     const {
       helper,
@@ -214,11 +206,7 @@ export class Helper {
     versionSpin.succeed();
 
     // Success
-    success(
-      `🎉 Updated to ${version} from ${
-        opts.packageName
-      } in ${helper.msToMinutesAndSeconds(timer())}m.`
-    );
+    success(`🎉 Updated to ${version} from ${opts.packageName} in ${helper.msToMinutesAndSeconds(timer())}m.`);
     info('');
   }
 
@@ -257,9 +245,7 @@ export class Helper {
         checkUpdate: true,
         level: pC ? pC.split(' ').length : 0,
         parentCommand: '',
-        welcome: pC
-          ? pC.charAt(0).toUpperCase() + pC.slice(1) + ' commands'
-          : ''
+        welcome: pC ? pC.charAt(0).toUpperCase() + pC.slice(1) + ' commands' : ''
       },
       options
     );
@@ -269,16 +255,14 @@ export class Helper {
       checkUpdate && // parameter
       config[brand].checkForUpdate && // current configuration
       (await helper.getConfig()).checkForUpdate && // extra configuration
-      !(await existsAsync(
-        join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src')
-      )) // not development environment
+      !(await existsAsync(join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src'))) // not development environment
     ) {
       config[brand].checkForUpdate = false;
 
       // tslint:disable-next-line:no-floating-promises
       toolbox.meta
         .checkForUpdate()
-        .then(update => {
+        .then((update) => {
           if (update) {
             // tslint:disable-next-line:no-floating-promises
             helper.updateCli().catch(() => {
@@ -299,14 +283,12 @@ export class Helper {
     // Get main commands
     let mainCommands = commands
       .filter(
-        c =>
+        (c) =>
           c.commandPath.length === level + 1 &&
           c.commandPath.join(' ').startsWith(parentCommand) &&
           !['lt', 'help'].includes(c.commandPath[0])
       )
-      .map(
-        c => c.commandPath[level] + (c.description ? ` (${c.description})` : '')
-      )
+      .map((c) => c.commandPath[level] + (c.description ? ` (${c.description})` : ''))
       .sort();
 
     // Additions commands
@@ -342,18 +324,13 @@ export class Helper {
         return;
       }
       case '[ help ]': {
-        (print.printCommands as any)(
-          toolbox,
-          level ? parentCommand.split(' ') : undefined
-        );
+        (print.printCommands as any)(toolbox, level ? parentCommand.split(' ') : undefined);
         break;
       }
       default: {
         // Get command
         const command = commands.filter(
-          c =>
-            c.commandPath.join(' ') ===
-            `${parentCommand} ${commandName}`.trim().replace(/\s\(.*\)$/, '')
+          (c) => c.commandPath.join(' ') === `${parentCommand} ${commandName}`.trim().replace(/\s\(.*\)$/, '')
         )[0];
 
         // Run command
