@@ -286,7 +286,7 @@ export class Helper {
         (c) =>
           c.commandPath.length === level + 1 &&
           c.commandPath.join(' ').startsWith(parentCommand) &&
-          !['lt', 'help'].includes(c.commandPath[0])
+          ![brand, 'help'].includes(c.commandPath[0])
       )
       .map((c) => c.commandPath[level] + (c.description ? ` (${c.description})` : ''))
       .sort();
@@ -336,6 +336,7 @@ export class Helper {
         // Run command
         try {
           await command.run(toolbox);
+          process.exit();
         } catch (e) {
           // Abort via CTRL-C
           if (!e) {
