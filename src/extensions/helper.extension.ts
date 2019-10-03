@@ -1,3 +1,4 @@
+import { Menu } from '@lenne.tech/gluegun-menu';
 import * as fs from 'fs';
 import * as os from 'os';
 import { join, sep } from 'path';
@@ -211,41 +212,28 @@ export class Helper {
   }
 
   /**
-   * Command selector
-   *
-   * Hint: this doesn't exists in this context!
-   * If you want to use external functions, use toolbox instead (e.g. toolbox.helper.trim)
+   * Show menu
    */
-  public async commandSelector(
-    toolbox: IHelperExtendedGluegunToolbox,
+  public async showMenu(
+    parentCommands?: string,
     options?: {
       checkUpdate?: boolean;
       level?: number;
-      parentCommand?: string;
-      welcome?: string;
+      headline?: string;
     }
   ) {
     // Toolbox feature
     const {
       config,
       filesystem: { existsAsync },
-      helper,
       meta,
-      print,
-      prompt,
-      runtime: { brand, commands, defaultPlugin }
-    } = toolbox;
-
-    // Prepare parent command
-    const pC = options.parentCommand ? options.parentCommand.trim() : '';
+      runtime: { brand, defaultPlugin }
+    } = this.toolbox;
 
     // Process options
-    const { checkUpdate, level, parentCommand, welcome } = Object.assign(
+    const { checkUpdate } = Object.assign(
       {
-        checkUpdate: true,
-        level: pC ? pC.split(' ').length : 0,
-        parentCommand: '',
-        welcome: pC ? pC.charAt(0).toUpperCase() + pC.slice(1) + ' commands' : ''
+        checkUpdate: true
       },
       options
     );
@@ -254,18 +242,18 @@ export class Helper {
     if (
       checkUpdate && // parameter
       config[brand].checkForUpdate && // current configuration
-      (await helper.getConfig()).checkForUpdate && // extra configuration
+      (await this.getConfig()).checkForUpdate && // extra configuration
       !(await existsAsync(join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src'))) // not development environment
     ) {
       config[brand].checkForUpdate = false;
 
       // tslint:disable-next-line:no-floating-promises
-      toolbox.meta
+      meta
         .checkForUpdate()
         .then((update) => {
           if (update) {
             // tslint:disable-next-line:no-floating-promises
-            helper.updateCli().catch(() => {
+            this.updateCli().catch(() => {
               // do nothing
             });
           }
@@ -275,79 +263,8 @@ export class Helper {
         });
     }
 
-    // Welcome
-    if (welcome) {
-      print.info(print.colors.cyan(welcome));
-    }
-
-    // Get main commands
-    let mainCommands = commands
-      .filter(
-        (c) =>
-          c.commandPath.length === level + 1 &&
-          c.commandPath.join(' ').startsWith(parentCommand) &&
-          ![brand, 'help'].includes(c.commandPath[0])
-      )
-      .map((c) => c.commandPath[level] + (c.description ? ` (${c.description})` : ''))
-      .sort();
-
-    // Additions commands
-    mainCommands = ['[ help ]'].concat(mainCommands);
-    if (level) {
-      mainCommands.push('[ back ]');
-    }
-    mainCommands.push('[ cancel ]');
-
-    // Select command
-    const { commandName } = await prompt.ask({
-      type: 'select',
-      name: 'commandName',
-      message: 'Select command',
-      choices: mainCommands.slice(0)
-    });
-
-    // Check command
-    if (!commandName) {
-      print.error('No command selected!');
-      return;
-    }
-
-    switch (commandName) {
-      case '[ back ]': {
-        await helper.commandSelector(toolbox, {
-          parentCommand: parentCommand.substr(0, parentCommand.lastIndexOf(' '))
-        });
-        return;
-      }
-      case '[ cancel ]': {
-        print.info('Take care 👋');
-        return;
-      }
-      case '[ help ]': {
-        (print.printCommands as any)(toolbox, level ? parentCommand.split(' ') : undefined);
-        break;
-      }
-      default: {
-        // Get command
-        const command = commands.filter(
-          (c) => c.commandPath.join(' ') === `${parentCommand} ${commandName}`.trim().replace(/\s\(.*\)$/, '')
-        )[0];
-
-        // Run command
-        try {
-          await command.run(toolbox);
-          process.exit();
-        } catch (e) {
-          // Abort via CTRL-C
-          if (!e) {
-            console.log('Goodbye ✌️');
-          } else {
-            // Throw error
-            throw e;
-          }
-        }
-      }
-    }
+    // ShowMenu
+    await new Menu(this.toolbox).showMenu(parentCommands, options);
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@lenne.tech/cli-plugin-helper",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Helper plugin for Gluegun CLI Projects",
   "keywords": [
     "lenne.Tech",
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "build": "npm run lint && npm run clean-build && npm run compile",
-    "clean-build": "rimraf ./build",
+    "clean-build": "rimraf ./dist",
     "compile": "tsc -p .",
     "coverage": "jest --coverage",
     "format": "prettier --write 'src/**/*.{js,ts,tsx,json}'",
@@ -34,7 +34,9 @@
     "test": "jest",
     "watch": "jest --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@lenne.tech/gluegun-menu": "0.0.1"
+  },
   "devDependencies": {
     "@lenne.tech/npm-package-helper": "0.0.10",
     "@types/jest": "24.0.18",
@@ -55,8 +57,8 @@
     "typescript": "3.6.3"
   },
   "peerDependencies": {
-    "find-file-up": "2.0.1",
-    "gluegun": "4.0.0"
+    "find-file-up": ">=2",
+    "gluegun": ">=3"
   },
   "jest": {
     "preset": "ts-jest",
