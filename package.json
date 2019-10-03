@@ -1,6 +1,6 @@
 {
   "name": "@lenne.tech/cli-plugin-helper",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Helper plugin for Gluegun CLI Projects",
   "keywords": [
     "lenne.Tech",
@@ -76,6 +76,7 @@
     "dist/**/*",
     "src/**/*",
     "LICENSE",
+    "assets/demo.gif",
     "README.md"
   ]
 }
