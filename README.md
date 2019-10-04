@@ -67,7 +67,7 @@ export interface ExtendedGluegunToolbox extends GluegunToolbox {
 `src/commands/YOUR_COMMAND/YOUR_COMMAND.ts`:
 
 ```typescript
-import { GluegunMenuToolbox } from '@lenne.tech/gluegun-menu';
+import { IHelperExtendedGluegunToolbox } from '@lenne.tech/cli-plugin-helper';
 
 /**
  * YOUR_COMMAND menu
@@ -77,7 +77,7 @@ module.exports = {
   alias: ['YOUR_COMMAND_ALIAS'],
   description: 'YOUR_DESCRIPTION',
   hidden: true,
-  run: async (toolbox: GluegunMenuToolbox) => {
+  run: async (toolbox: IHelperExtendedGluegunToolbox) => {
     await toolbox.helper.showMenu('(PARANT_COMMANDS) YOUR_COMMAND');
   }
 };
@@ -121,7 +121,7 @@ src/commands/
 `src/commands/brand.ts`:
 
 ```typescript
-import { GluegunMenuToolbox } from '@lenne.tech/gluegun-menu';
+import { IHelperExtendedGluegunToolbox } from '@lenne.tech/cli-plugin-helper';
 
 /**
  * Main menu
@@ -130,7 +130,7 @@ module.exports = {
   name: 'brand',
   description: 'Welcome to brand CLI',
   hidden: true,
-  run: async (toolbox: GluegunMenuToolbox) => {
+  run: async (toolbox: IHelperExtendedGluegunToolbox) => {
     await toolbox.helper.showMenu();
   }
 };
@@ -139,7 +139,7 @@ module.exports = {
 `src/commands/section1/section1.ts`:
 
 ```typescript
-import { GluegunMenuToolbox } from '@lenne.tech/gluegun-menu';
+import { IHelperExtendedGluegunToolbox } from '@lenne.tech/cli-plugin-helper';
 
 /**
  * Section1 menu
@@ -149,7 +149,7 @@ module.exports = {
   alias: ['s1'],
   description: 'Description for section1',
   hidden: true,
-  run: async (toolbox: GluegunMenuToolbox) => {
+  run: async (toolbox: IHelperExtendedGluegunToolbox) => {
     await toolbox.helper.showMenu('section1');
   }
 };
@@ -158,7 +158,7 @@ module.exports = {
 `src/commands/section1/subsection1/subsection1.ts`:
 
 ```typescript
-import { GluegunMenuToolbox } from '@lenne.tech/gluegun-menu';
+import { IHelperExtendedGluegunToolbox } from '@lenne.tech/cli-plugin-helper';
 
 /**
  * Subsection1 menu
@@ -168,7 +168,7 @@ module.exports = {
   alias: ['sub1'],
   description: 'Description for subsection1',
   hidden: true,
-  run: async (toolbox: GluegunMenuToolbox) => {
+  run: async (toolbox: IHelperExtendedGluegunToolbox) => {
     await toolbox.helper.showMenu('section1 subsection1', { headline: 'Subsection1 commands' });
   }
 };
