@@ -1,6 +1,6 @@
 {
   "name": "@lenne.tech/cli-plugin-helper",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Helper plugin for Gluegun CLI Projects",
   "keywords": [
     "lenne.Tech",
@@ -35,7 +35,7 @@
     "watch": "jest --watch"
   },
   "dependencies": {
-    "@lenne.tech/gluegun-menu": "0.0.1"
+    "@lenne.tech/gluegun-menu": "0.0.2"
   },
   "devDependencies": {
     "@lenne.tech/npm-package-helper": "0.0.10",
