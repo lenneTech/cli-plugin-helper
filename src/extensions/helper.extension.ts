@@ -2,6 +2,7 @@ import { Menu } from '@lenne.tech/gluegun-menu';
 import * as fs from 'fs';
 import * as os from 'os';
 import { join, sep } from 'path';
+
 import { IHelperExtendedGluegunToolbox } from '../interfaces/extended-gluegun-toolbox.interface';
 
 /**
@@ -21,13 +22,13 @@ export class Helper {
     const {
       config,
       filesystem,
-      runtime: { brand }
+      runtime: { brand },
     } = this.toolbox;
 
     // Configuration in home directory (~/.brand)
     let homeDirConfig = {};
     try {
-      const homeDirConfigFile = join(filesystem.homedir(), '.' + brand);
+      const homeDirConfigFile = join(filesystem.homedir(), `.${brand}`);
       if (await filesystem.existsAsync(homeDirConfigFile)) {
         homeDirConfig = JSON.parse(await filesystem.readAsync(homeDirConfigFile));
       }
@@ -38,7 +39,7 @@ export class Helper {
     // Configuration in current directory (./.brand)
     let currentDirConfig = {};
     try {
-      const currentDirConfigFile = join(filesystem.cwd(), '.' + brand);
+      const currentDirConfigFile = join(filesystem.cwd(), `.${brand}`);
       if (await filesystem.existsAsync(currentDirConfigFile)) {
         currentDirConfig = JSON.parse(await filesystem.readAsync(currentDirConfigFile));
       }
@@ -51,7 +52,7 @@ export class Helper {
       ...config.loadConfig(join('~', `.${brand}`), brand),
       ...homeDirConfig,
       ...config.loadConfig(join(filesystem.cwd(), `.${brand}`), brand),
-      ...currentDirConfig
+      ...currentDirConfig,
     };
   }
 
@@ -73,20 +74,20 @@ export class Helper {
   public async getInput(
     input: string,
     options?: {
+      errorMessage?: string;
       initial?: string;
       name?: string;
-      errorMessage?: string;
       showError?: boolean;
-    }
+    },
   ) {
     // Process options
     const opts = Object.assign(
       {
         initial: '',
         name: 'name',
-        showError: false
+        showError: false,
       },
-      options
+      options,
     );
     if (!opts.errorMessage) {
       opts.errorMessage = `You must provide a valid ${opts.name}!`;
@@ -95,16 +96,16 @@ export class Helper {
     // Toolbox features
     const {
       print: { error },
-      prompt: { ask }
+      prompt: { ask },
     } = this.toolbox;
 
     // Get input
     if (!input || !this.trim(input)) {
       const answers = await ask({
         initial: opts.initial,
-        type: 'input',
+        message: `Enter ${opts.name}`,
         name: 'input',
-        message: `Enter ${opts.name}`
+        type: 'input',
       });
       input = answers.input;
       if (!input && opts.showError) {
@@ -122,7 +123,7 @@ export class Helper {
   public msToMinutesAndSeconds(ms: number) {
     const minutes = Math.floor((ms / 1000 / 60) << 0);
     const seconds = Math.floor((ms / 1000) % 60);
-    return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
 
   /**
@@ -170,7 +171,7 @@ export class Helper {
       meta,
       print: { info, spin, success },
       runtime: { brand, defaultPlugin },
-      system: { run, startTimer }
+      system: { run, startTimer },
     } = this.toolbox;
 
     // Start timer
@@ -178,7 +179,7 @@ export class Helper {
 
     // Get package.json
     const packageJson: any = await helper.readFile(
-      join(meta.src ? meta.src : defaultPlugin.directory, '..', 'package.json')
+      join(meta.src ? meta.src : defaultPlugin.directory, '..', 'package.json'),
     );
 
     // Process options
@@ -186,9 +187,9 @@ export class Helper {
       {
         global: true,
         packageName: packageJson ? packageJson.name : '',
-        showInfos: false
+        showInfos: false,
       },
-      options
+      options,
     );
 
     // Run without infos
@@ -218,32 +219,32 @@ export class Helper {
     parentCommands?: string,
     options?: {
       checkUpdate?: boolean;
-      level?: number;
       headline?: string;
-    }
+      level?: number;
+    },
   ) {
     // Toolbox feature
     const {
       config,
       filesystem: { existsAsync },
       meta,
-      runtime: { brand, defaultPlugin }
+      runtime: { brand, defaultPlugin },
     } = this.toolbox;
 
     // Process options
     const { checkUpdate } = Object.assign(
       {
-        checkUpdate: true
+        checkUpdate: true,
       },
-      options
+      options,
     );
 
     // Check for updates
     if (
-      checkUpdate && // parameter
-      config[brand].checkForUpdate && // current configuration
-      (await this.getConfig()).checkForUpdate && // extra configuration
-      !(await existsAsync(join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src'))) // not development environment
+      checkUpdate // parameter
+      && config[brand].checkForUpdate // current configuration
+      && (await this.getConfig()).checkForUpdate // extra configuration
+      && !(await existsAsync(join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src'))) // not development environment
     ) {
       config[brand].checkForUpdate = false;
 

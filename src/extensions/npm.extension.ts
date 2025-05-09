@@ -1,6 +1,7 @@
 import * as find from 'find-file-up';
 import * as fs from 'fs';
 import { dirname } from 'path';
+
 import { IHelperExtendedGluegunToolbox } from '../interfaces/extended-gluegun-toolbox.interface';
 
 /**
@@ -16,13 +17,13 @@ export class Npm {
    * Get package.json
    */
   public async getPackageJson(
-    options: { cwd?: string; errorMessage?: string; showError?: boolean } = {}
-  ): Promise<{ path: string; data: any }> {
+    options: { cwd?: string; errorMessage?: string; showError?: boolean } = {},
+  ): Promise<{ data: any; path: string }> {
     // Toolbox features
     const {
       filesystem,
       helper,
-      print: { error }
+      print: { error },
     } = this.toolbox;
 
     // Prepare options
@@ -30,9 +31,9 @@ export class Npm {
       {
         cwd: filesystem.cwd(),
         errorMessage: 'No package.json found!',
-        showError: false
+        showError: false,
       },
-      options
+      options,
     );
 
     // Find package.json
@@ -41,11 +42,11 @@ export class Npm {
       if (opts.showError) {
         error(opts.errorMessage);
       }
-      return { path: '', data: null };
+      return { data: null, path: '' };
     }
 
     // Everything ok
-    return { path: path, data: await helper.readFile(path) };
+    return { data: await helper.readFile(path), path };
   }
 
   /**
@@ -57,7 +58,7 @@ export class Npm {
       cwd?: string;
       errorMessage?: string;
       showError?: boolean;
-    } = {}
+    } = {},
   ) {
     if (typeof data === 'object') {
       data = JSON.stringify(data, null, 2);
@@ -88,8 +89,8 @@ export class Npm {
     // Toolbox features
     const {
       filesystem,
+      print: { spin },
       system,
-      print: { spin }
     } = this.toolbox;
 
     // Prepare options
@@ -97,9 +98,9 @@ export class Npm {
       {
         cwd: filesystem.cwd(),
         errorMessage: 'No package.json found!',
-        showError: false
+        showError: false,
       },
-      options
+      options,
     );
 
     // Find package.json
@@ -124,13 +125,13 @@ export class Npm {
       errorMessage?: string;
       install?: boolean;
       showError?: boolean;
-    } = {}
+    } = {},
   ) {
     // Toolbox features
     const {
       filesystem,
+      print: { spin },
       system,
-      print: { spin }
     } = this.toolbox;
 
     // Prepare options
@@ -139,9 +140,9 @@ export class Npm {
         cwd: filesystem.cwd(),
         errorMessage: 'No package.json found!',
         install: false,
-        showError: false
+        showError: false,
       },
-      options
+      options,
     );
 
     // Find package.json
@@ -159,7 +160,7 @@ export class Npm {
 
     // Update package.json
     const updateSpin = spin('Update package.json');
-    await system.run('ncu -u --packageFile ' + path);
+    await system.run(`ncu -u --packageFile ${path}`);
     updateSpin.succeed();
 
     // Install packages
