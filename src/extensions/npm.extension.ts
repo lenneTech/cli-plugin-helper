@@ -83,9 +83,26 @@ export class Npm {
   }
 
   /**
+   * Detect which package manager is used in the project
+   */
+  public detectPackageManager(projectPath: string): 'npm' | 'pnpm' | 'yarn' {
+    const { filesystem } = this.toolbox;
+
+    // Check for lock files in the project directory
+    if (filesystem.exists(`${projectPath}/pnpm-lock.yaml`)) {
+      return 'pnpm';
+    }
+    if (filesystem.exists(`${projectPath}/yarn.lock`)) {
+      return 'yarn';
+    }
+    // Default to npm
+    return 'npm';
+  }
+
+  /**
    * Install npm packages
    */
-  public async install(options: { cwd?: string; errorMessage?: string; showError?: boolean } = {}) {
+  public async install(options: { cwd?: string; detectPackageManager?: boolean; errorMessage?: string; showError?: boolean } = {}) {
     // Toolbox features
     const {
       filesystem,
@@ -97,6 +114,7 @@ export class Npm {
     const opts = Object.assign(
       {
         cwd: filesystem.cwd(),
+        detectPackageManager: true,
         errorMessage: 'No package.json found!',
         showError: false,
       },
@@ -109,10 +127,28 @@ export class Npm {
       return false;
     }
 
-    // Install npm packages
-    const npmSpin = spin('Install npm packages');
-    await system.run(`cd ${dirname(path)} && npm i`);
-    npmSpin.succeed();
+    const projectDir = dirname(path);
+    const packageManager = opts.detectPackageManager ? this.detectPackageManager(projectDir) : 'npm';
+
+    // Install packages with the appropriate package manager
+    const installSpin = spin(`Install packages using ${packageManager}`);
+
+    let installCommand: string;
+    switch (packageManager) {
+      case 'pnpm':
+        installCommand = 'pnpm install';
+        break;
+      case 'yarn':
+        installCommand = 'yarn install';
+        break;
+      case 'npm':
+      default:
+        installCommand = 'npm i';
+        break;
+    }
+
+    await system.run(`cd ${projectDir} && ${installCommand}`);
+    installSpin.succeed();
     return true;
   }
 
@@ -165,8 +201,25 @@ export class Npm {
 
     // Install packages
     if (opts.install) {
-      const installSpin = spin('Install npm packages');
-      await system.run(`cd ${dirname(path)} && npm i`);
+      const projectDir = dirname(path);
+      const packageManager = this.detectPackageManager(projectDir);
+      const installSpin = spin(`Install packages using ${packageManager}`);
+
+      let installCommand: string;
+      switch (packageManager) {
+        case 'pnpm':
+          installCommand = 'pnpm install';
+          break;
+        case 'yarn':
+          installCommand = 'yarn install';
+          break;
+        case 'npm':
+        default:
+          installCommand = 'npm i';
+          break;
+      }
+
+      await system.run(`cd ${projectDir} && ${installCommand}`);
       installSpin.succeed();
     }
 
