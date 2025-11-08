@@ -240,16 +240,17 @@ export class Helper {
     );
 
     // Check for updates
-    if (
-      checkUpdate // parameter
-      && config[brand].checkForUpdate // current configuration
-      && (await this.getConfig()).checkForUpdate // extra configuration
-      && !(await existsAsync(join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src'))) // not development environment
-    ) {
-      config[brand].checkForUpdate = false;
+    try {
+      if (
+        checkUpdate // parameter
+        && brand && config[brand]?.checkForUpdate // current configuration
+        && (await this.getConfig()).checkForUpdate // extra configuration
+        && !(await existsAsync(join(meta.src ? meta.src : defaultPlugin.directory, '..', 'src'))) // not development environment
+      ) {
+        config[brand].checkForUpdate = false;
 
-      // tslint:disable-next-line:no-floating-promises
-      meta
+        // tslint:disable-next-line:no-floating-promises
+        meta
         .checkForUpdate()
         .then((update) => {
           if (update) {
@@ -262,6 +263,9 @@ export class Helper {
         .catch(() => {
           // do nothing
         });
+      }
+    } catch (e) {
+      // do nothing
     }
 
     // ShowMenu
